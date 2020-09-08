@@ -44,7 +44,7 @@ const cashOut = (userType, amount, currency, apiConfig, transactionHistory) => {
             break;
         }
         case 'juridical': {
-            commissionFee = cashOutLegal(amount, currency, apiConfig);
+            commissionFee = cashOutJuridical(amount, currency, apiConfig);
             break;
         }
         default: {
@@ -72,7 +72,7 @@ const cashOutNatural = (amount, currency, apiConfig, transactionHistory) => {
     return commisionFee;
 }
 
-const cashOutLegal = (amount, currency, apiConfig) => {
+const cashOutJuridical = (amount, currency, apiConfig) => {
     const { percents, min: { amount: minAmount } } = apiConfig;
     let commissionFee = 0;
     commissionFee = amount / 100 * percents;
@@ -97,10 +97,7 @@ const getFeesToChargeOn = (amount, totalCashout, weekLimit) => {
     if (totalCashout >= weekLimit) {
         return amount;
     }
-    if (amount <= weekLimit) {
-        return 0;
-    }
-    return amount - weekLimit
+    return amount <= weekLimit ? 0 : amount - weekLimit; 
 }
 
 const round = (value, decimalPlaces) => Math.ceil(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);

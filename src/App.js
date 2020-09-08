@@ -12,7 +12,7 @@ try {
             throw new Error(`${error.message}`);
         });
 } catch (error) {
-    console.log(error);
+    throw new Error(`${error.message}`);
 }
 
 const runPromisesInSequance = (array, promiseFunction) => {
@@ -27,14 +27,11 @@ const runPromisesInSequance = (array, promiseFunction) => {
                     });
             })
             .catch((error) => {
-                console.log(error);
+                throw new Error(`${error.message}`);
             });
     }, Promise.resolve())
-        .then((result) => {
-            
-        })
         .catch((error) => {
-            console.log(error);
+            throw new Error(`${error.message}`);
         });
 }
 
@@ -44,8 +41,8 @@ const getTransactions = (array, index, userType, operationType, operationDate) =
         let monday = new Date(transaction.getTransactionWeekRange(operationDate));
         let passedTransactionDate = new Date(element.date);
         let currentTransactionDate = new Date(operationDate);
-        return (element.user_type === userType) 
-                && (element.type === operationType)  
-                && (passedTransactionDate >= monday && passedTransactionDate <= currentTransactionDate);
+        return (element.user_type === userType)
+            && (element.type === operationType)
+            && (passedTransactionDate >= monday && passedTransactionDate <= currentTransactionDate);
     });
 }
