@@ -6,13 +6,7 @@ try {
     let filePath = process.argv.slice(2);
     payload.readFile(filePath[0])
         .then((file) => {
-            runPropmisesTemp(file, fees.calculateFees)
-            .then((result) => {
-                console.log(result);
-            })
-            .catch((error) => {
-                console.log(error);
-            })
+            runPromisesInSequance(file, fees.calculateFees);
         })
         .catch((error) => {
             throw new Error(`${error.message}`);
@@ -44,24 +38,14 @@ const runPromisesInSequance = (array, promiseFunction) => {
         });
 }
 
-const runPropmisesTemp = (array, promiseFunction) => {
-        array.reduce((prevPromise, currentItem) => {
-            return prevPromise
-            .then(() => {
-                const { user_type: userType, type, user_id } = currentItem;
-                let transactionHis = getTransactions(array, array.indexOf(currentItem), userType, type, currentItem.date);
-                return promiseFunction(currentItem, transactionHis);
-            })
-            .catch((error) => {
-                console.log(error);
-            })
-        }, Promise.resolve({}));
-}
-
 const getTransactions = (array, index, userType, operationType, operationDate) => {
     let transactionHistory = array.slice(0, index);
     return transactionHistory.filter((element) => {
         let monday = new Date(transaction.getTransactionWeekRange(operationDate));
-        return (element.user_type === userType) && (element.type === operationType)  && (new Date(element.date) >= monday && new Date(element.date) <= new Date(operationDate));
+        let passedTransactionDate = new Date(element.date);
+        let currentTransactionDate = new Date(operationDate);
+        return (element.user_type === userType) 
+                && (element.type === operationType)  
+                && (passedTransactionDate >= monday && passedTransactionDate <= currentTransactionDate);
     });
 }
