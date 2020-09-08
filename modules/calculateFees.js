@@ -2,17 +2,16 @@ const axios = require('axios');
 const config = require("../config/config.json")
 const transaction = require('../modules/Transaction');
 
-const calculateFees = (transactionObject, transactinHistory) => {
-    if (isObjectEmpty(transactionObject)) {
+const calculateFees = (currentTransaction, transactionHistory) => {
+    if (isObjectEmpty(currentTransaction)) {
         throw new Error('calculateFees() Transaction object is empty');
     }
     
-    const { type: transactionType, user_type: userType, user_id, operation: {amount}, date } = transactionObject;
+    const { type: transactionType, user_type: userType, user_id, operation: {amount}, date } = currentTransaction;
     return new Promise((resolve, reject) => {
         getApiConfig(transactionType, userType)
             .then((apiConfig) => {
-                let userTransactionHistory = transactinHistory.filter(element => element.user_id === user_id);
-                let commisionFee = transaction.transaction(transactionObject, apiConfig, userTransactionHistory);
+                let commisionFee = transaction.transaction(currentTransaction, apiConfig, transactionHistory);
                 resolve(commisionFee);
             })
             .catch((error) => {

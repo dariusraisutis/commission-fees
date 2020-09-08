@@ -91,11 +91,11 @@ const getTransactionWeekRange = (date) => {
 }
 
 const getFeesToChargeOn = (amount, totalCashout, weekLimit) => {
-    if (totalCashout < weekLimit) {
-        weekLimit -= totalCashout
-    }
     if (totalCashout >= weekLimit) {
         return amount;
+    }
+    if (totalCashout < weekLimit) {
+       weekLimit = round(weekLimit -= totalCashout, 2);
     }
     return amount <= weekLimit ? 0 : amount - weekLimit; 
 }

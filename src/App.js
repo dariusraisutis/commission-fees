@@ -19,8 +19,8 @@ const runPromisesInSequance = (array, promiseFunction) => {
     return array.reduce((prevPromise, currentItem) => {
         return prevPromise
             .then(() => {
-                const { user_type: userType, type, user_id } = currentItem;
-                let transactionHis = getTransactions(array, array.indexOf(currentItem), userType, type, currentItem.date);
+                const { user_type: userType, type, user_id: userId } = currentItem;
+                let transactionHis = getTransactions(array, array.indexOf(currentItem), userType, userId, type, currentItem.date);
                 return promiseFunction(currentItem, transactionHis)
                     .then((result) => {
                         console.log(result);
@@ -35,13 +35,14 @@ const runPromisesInSequance = (array, promiseFunction) => {
         });
 }
 
-const getTransactions = (array, index, userType, operationType, operationDate) => {
+const getTransactions = (array, index, userType, userId, operationType, operationDate) => {
     let transactionHistory = array.slice(0, index);
     return transactionHistory.filter((element) => {
         let monday = new Date(transaction.getTransactionWeekRange(operationDate));
         let passedTransactionDate = new Date(element.date);
         let currentTransactionDate = new Date(operationDate);
         return (element.user_type === userType)
+            && (element.user_id === userId)
             && (element.type === operationType)
             && (passedTransactionDate >= monday && passedTransactionDate <= currentTransactionDate);
     });
