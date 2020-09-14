@@ -9,7 +9,7 @@ const getFees = (currentTransaction, transactionHistory) => {
         }
         const { type: transactionType, user_type: userType, operation: { currency } } = currentTransaction;
         if (!utils.isSupportedCurrency(currency)) {
-            reject(`getFees() Operation currency is not supported. Currency ${currency}`);
+            reject(new Error(`getFees() Operation currency is not supported. Currency ${currency}`));
         }
         apiConfigProvider.getApiConfig(transactionType, userType)
             .then((apiConfig) => {

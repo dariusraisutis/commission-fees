@@ -67,7 +67,7 @@ describe('GetFees Tests', () => {
                 fail('Resolved with invalid currency')
             })
             .catch((error) => {
-                expect(error).toBe('getFees() Operation currency is not supported. Currency GBP');
+                expect(error.message).toBe('getFees() Operation currency is not supported. Currency GBP');
             });
     })
 
