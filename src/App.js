@@ -1,6 +1,5 @@
 const main = require('./main/Main');
 
-
 let filePath = process.argv.slice(2);
 main.run(filePath[0])
     .then((result) => {

@@ -1,7 +1,6 @@
 const utils = require('../utils/Utils');
 const cashIn = require('./CashIn');
 const cashout = require('./CashOut');
-const { isObjectEmpty } = require('../utils/Utils');
 
 const calculateFees = (transactionObj, transactionHistory, apiConfig) => {
     if (utils.isObjectEmpty(transactionObj)) {
@@ -50,20 +49,20 @@ const getTransactionHistory = ({ array, date, userId, userType, type, index }) =
 }
 
 const checkTransactionProps = (transactionProps) => {
-    if(isObjectEmpty(transactionProps)) {
+    if (utils.isObjectEmpty(transactionProps)) {
         throw new Error('checkTransactionProps() Transactionprops are empty');
     }
     Object.keys(transactionProps).filter((prop) => {
-      if (transactionProps[prop] === ''
-          || transactionProps[prop] === undefined
-          || transactionProps[prop] === null
-          || transactionProps[prop].length === 0
+        if (transactionProps[prop] === ''
+            || transactionProps[prop] === undefined
+            || transactionProps[prop] === null
+            || transactionProps[prop].length === 0
         ) {
-          throw new Error(`checkTransactionProps() Property missing ${prop}.`);
+            throw new Error(`checkTransactionProps() Property missing ${prop}.`);
         }
     });
     return true;
-  }
+}
 
 
 module.exports = {

@@ -22,4 +22,4 @@ const run = (filePath) => {
   })
 }
 
-module.exports = {  run };
+module.exports = { run };

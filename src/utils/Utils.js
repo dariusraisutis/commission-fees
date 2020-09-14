@@ -8,8 +8,6 @@ const buildApiConfigUrl = (transactionType, userType) => {
     return `${config.commissionFeesConfigUrl}/config/${transactionType}/${userType}`;
 }
 
-
-
 const getCurrencyDecimalPlaces = (currency) => {
     if(currency === null || currency === undefined || currency === '' || isNaN(currency)) {
         throw new Error('getCurrencyDecimalPlaces() currency is empty');

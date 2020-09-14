@@ -12,10 +12,10 @@ const readFile = (filePath) => {
             }
             try {
                 let file = JSON.parse(data);
-                if(Array.isArray(file) && file.length === 0 || utils.isObjectEmpty(file)){
+                if (Array.isArray(file) && file.length === 0 || utils.isObjectEmpty(file)) {
                     reject(new Error('readFile() File contents are empty.'));
                 }
-                if(!Array.isArray(file) && !utils.isObjectEmpty(file)){
+                if (!Array.isArray(file) && !utils.isObjectEmpty(file)) {
                     let singleValueArray = [];
                     singleValueArray.push(file);
                     resolve(singleValueArray);

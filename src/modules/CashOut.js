@@ -1,16 +1,16 @@
 const utils = require("../utils/Utils");
 
 const cashOut = (userType, amount, currency, apiConfig, transactionHistory) => {
-    if(!userType){
+    if (!userType) {
         throw new Error(`cashOut() userType is invalid. ${userType}`);
     }
-    if(!amount || isNaN(amount) || amount < 0) {
+    if (!amount || isNaN(amount) || amount < 0) {
         throw new Error(`cashOut() Invalid operation amount. ${amount}`);
     }
-    if(utils.isObjectEmpty(apiConfig)){
+    if (utils.isObjectEmpty(apiConfig)) {
         throw new Error('cashOut() Api Config is empty.');
     }
-    if(!Array.isArray(transactionHistory)){
+    if (!Array.isArray(transactionHistory)) {
         throw new Error('cashOut() Transaction history is invalid.');
     }
     let commissionFee = 0;

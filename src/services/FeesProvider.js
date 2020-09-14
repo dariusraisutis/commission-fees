@@ -7,8 +7,8 @@ const getFees = (currentTransaction, transactionHistory) => {
         if (utils.isObjectEmpty(currentTransaction)) {
             reject(new Error('getFees() Transaction object is empty'));
         }
-        const { type: transactionType, user_type: userType, operation: {currency} } = currentTransaction;
-        if(!utils.isSupportedCurrency(currency)){
+        const { type: transactionType, user_type: userType, operation: { currency } } = currentTransaction;
+        if (!utils.isSupportedCurrency(currency)) {
             reject(`getFees() Operation currency is not supported. Currency ${currency}`);
         }
         apiConfigProvider.getApiConfig(transactionType, userType)
@@ -23,45 +23,45 @@ const getFees = (currentTransaction, transactionHistory) => {
 }
 
 const getPromises = (fileData) => {
-    if(fileData.length === 0) {
-      throw new Error(`getPromises() fileData is empty`);
+    if (fileData.length === 0) {
+        throw new Error(`getPromises() fileData is empty`);
     }
     let promiseArray = [];
     fileData.map((currentTransaction) => {
-      const { user_type: userType, user_id: userId, type, date } = currentTransaction;
-      let transactionProps = {
-        array: fileData,
-        date,
-        userId,
-        userType,
-        type,
-        index: fileData.indexOf(currentTransaction)
-      };
-      transaction.checkTransactionProps(transactionProps);
-      let transactionHistory = transaction.getTransactionHistory(transactionProps);
-      let promiseFunction = getFees(currentTransaction, transactionHistory);
-      return promiseArray.push(promiseFunction);
+        const { user_type: userType, user_id: userId, type, date } = currentTransaction;
+        let transactionProps = {
+            array: fileData,
+            date,
+            userId,
+            userType,
+            type,
+            index: fileData.indexOf(currentTransaction)
+        };
+        transaction.checkTransactionProps(transactionProps);
+        let transactionHistory = transaction.getTransactionHistory(transactionProps);
+        let promiseFunction = getFees(currentTransaction, transactionHistory);
+        return promiseArray.push(promiseFunction);
     });
     return promiseArray;
 }
 
 const getAllFees = (arrayOfPromises) => {
     return new Promise((resolve, reject) => {
-        if(arrayOfPromises.length === 0){
+        if (arrayOfPromises.length === 0) {
             reject(new Error('getAllFees() Promise array is empty'));
         }
         Promise.all(arrayOfPromises)
-        .then((result) => {
-            resolve(result);
-        })
-        .catch((error) => {
-            reject(error);
-        });
+            .then((result) => {
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
     })
 }
 
-module.exports = { 
+module.exports = {
     getFees,
     getPromises,
     getAllFees
- };
+};

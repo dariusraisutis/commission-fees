@@ -4,7 +4,7 @@ const cashIn = (amount, currency, apiConfig) => {
     if (!amount || isNaN(amount) || amount < 0) {
         throw new Error(`cachIn() invalid operation amount. ${amount}`);
     }
-    if(utils.isObjectEmpty(apiConfig)){
+    if (utils.isObjectEmpty(apiConfig)) {
         throw new Error('cachIn() Api Config is empty');
     }
     const { max: { amount: maxAmount }, percents } = apiConfig;
