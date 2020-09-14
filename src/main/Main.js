@@ -10,10 +10,10 @@ const run = (filePath) => {
       .then((result) => {
         feesProvider.getAllFees(feesProvider.getPromises(result))
           .then((fees) => {
-            resolve(fees)
+            resolve(fees);
           })
           .catch((error) => {
-            reject(error.message)
+            reject(error.message);
           })
       })
       .catch((error) => {
