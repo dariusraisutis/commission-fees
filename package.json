@@ -4,9 +4,22 @@
     "version": "1.0.0",
     "main": "app.js",
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "test": "jest --coverage --coverageDirectory=output/coverage/jest"
     },
+    "jest": {
+        "coverageReporters": [
+          "text",
+          "html"
+        ],
+        "roots": [
+          "tests"
+        ],
+        "collectCoverage": true,
+        "coverageDirectory": "<rootDir>/coverage/"
+      },
     "dependencies": {
-        "axios": "^0.20.0"
+        "axios": "^0.20.0",
+        "jest": "^26.4.2"
     }
 }

@@ -1,86 +1,31 @@
 const utils = require('../utils/Utils');
+const cashIn = require('./CashIn');
+const cashout = require('./CashOut');
+const { isObjectEmpty } = require('../utils/Utils');
+
 const calculateFees = (transactionObj, transactionHistory, apiConfig) => {
     if (utils.isObjectEmpty(transactionObj)) {
-        throw new Error('transaction() Transaction object is empty');
+        throw new Error('calculateFees() Transaction object is empty');
     }
-    const { type: transactionType, user_type: userType, operation: { amount, currency } } = transactionObj || {};
+    if (utils.isObjectEmpty(apiConfig)) {
+        throw new Error('calculateFees() ApiConfig object is empty');
+    }
+    const { type: transactionType, user_type: userType, operation: { amount, currency } } = transactionObj;
     let commissionFee = 0;
     switch (transactionType) {
         case 'cash_in': {
-            commissionFee = cashIn(amount, currency, apiConfig);
+            commissionFee = cashIn.cashIn(amount, currency, apiConfig);
             break;
         }
         case 'cash_out': {
-            commissionFee = cashOut(userType, amount, currency, apiConfig, transactionHistory);
+            commissionFee = cashout.cashOut(userType, amount, currency, apiConfig, transactionHistory);
             break;
         }
         default: {
-            throw new Error(`transaction() invalid transaction type. Transaction type : ${transactionType}`);
+            throw new Error(`calculateFees() invalid transaction type. Transaction type : ${transactionType}`);
         }
     }
     return commissionFee;
-}
-
-const cashIn = (amount, currency, apiConfig) => {
-    let commissionFee = 0;
-    if (!amount) {
-        throw new Error(`cachIn() operation amount is empty. ${amount}`);
-    }
-    const { max: { amount: maxAmount }, percents } = apiConfig;
-    commissionFee = utils.round(amount / 100 * percents, 2).toFixed(2);
-    return commissionFee <= maxAmount ? commissionFee : maxAmount.toFixed(2);
-}
-
-const cashOut = (userType, amount, currency, apiConfig, transactionHistory) => {
-    let commissionFee = 0;
-    switch (userType) {
-        case 'natural': {
-            commissionFee = cashOutNatural(amount, currency, apiConfig, transactionHistory);
-            break;
-        }
-        case 'juridical': {
-            commissionFee = cashOutJuridical(amount, currency, apiConfig);
-            break;
-        }
-        default: {
-            throw new Error(`cashOut() user type is invalid. User type: ${userType}`);
-        }
-    }
-    return commissionFee;
-}
-
-const cashOutNatural = (amount, currency, apiConfig, transactionHistory) => {
-    const { percents, week_limit: { amount: weekLimit } } = apiConfig || {};
-    let commisionFee = 0;
-    let totalCashOut = 0;
-    if (transactionHistory.length != 0) {
-        transactionHistory.map(({ operation: { amount } }) => {
-            totalCashOut += amount;
-        });
-    }
-    let feesToChargeOn = getFeesToChargeOn(amount, totalCashOut, weekLimit);
-    if (feesToChargeOn === 0) {
-        return commisionFee.toFixed(2);
-    }
-    return utils.round(feesToChargeOn / 100 * percents, 2).toFixed(2);
-}
-
-const cashOutJuridical = (amount, currency, apiConfig) => {
-    const { percents, min: { amount: minAmount } } = apiConfig || {};
-    let commissionFee = 0;
-    commissionFee = amount / 100 * percents;
-    return commissionFee < minAmount ? minAmount : utils.round(commissionFee, 2).toFixed();
-}
-
-
-const getFeesToChargeOn = (amount, totalCashout, weekLimit) => {
-    if (totalCashout >= weekLimit) {
-        return amount;
-    }
-    if (weekLimit < totalCashout) {
-        weekLimit = utils.round(weekLimit -= totalCashout, 2);
-    }
-    return amount <= weekLimit ? 0 : amount - weekLimit; 
 }
 
 const getTransactionWeekRange = (date) => {
@@ -104,9 +49,27 @@ const getTransactionHistory = ({ array, date, userId, userType, type, index }) =
     });
 }
 
+const checkTransactionProps = (transactionProps) => {
+    if(isObjectEmpty(transactionProps)) {
+        throw new Error('checkTransactionProps() Transactionprops are empty');
+    }
+    Object.keys(transactionProps).filter((prop) => {
+      if (transactionProps[prop] === ''
+          || transactionProps[prop] === undefined
+          || transactionProps[prop] === null
+          || transactionProps[prop].length === 0
+        ) {
+          throw new Error(`checkTransactionProps() Property missing ${prop}.`);
+        }
+    });
+    return true;
+  }
+
+
 module.exports = {
     calculateFees,
     getTransactionWeekRange,
-    getTransactionHistory
+    getTransactionHistory,
+    checkTransactionProps
 }
 

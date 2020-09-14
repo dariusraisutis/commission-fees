@@ -8,11 +8,41 @@ const buildApiConfigUrl = (transactionType, userType) => {
     return `${config.commissionFeesConfigUrl}/config/${transactionType}/${userType}`;
 }
 
+
+
+const getCurrencyDecimalPlaces = (currency) => {
+    if(currency === null || currency === undefined || currency === '' || isNaN(currency)) {
+        throw new Error('getCurrencyDecimalPlaces() currency is empty');
+    }
+    return currency.indexOf('.') === -1 ? 0 : currency.toString().split('.')[1].length
+}
+
+const isSupportedCurrency = (currency) => {
+    if(!currency) {
+        throw new Error('isSupportedCurrency() currency is empty');
+    }
+    let currencies = config.supportedCurrencies;
+    return currencies.some(element => element.name === currency);
+}
+
+const getCurrencyValueByName = (currency) => {
+    if(!isSupportedCurrency(currency)){
+        throw new Error(`getCurrencyValueDecimalPlaces() currency is not supported. Currency ${currency}`);
+    }
+    let supportedCurrencies = config.supportedCurrencies;
+    let keyValuePair = supportedCurrencies.find(element => element.name === currency);
+    return getCurrencyDecimalPlaces(keyValuePair.value);
+}
+
 const isObjectEmpty = obj => Object.keys(obj).length === 0;
+
 const round = (value, decimalPlaces) => Math.ceil(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
 
 module.exports = {
     buildApiConfigUrl,
     isObjectEmpty,
-    round
+    round,
+    isSupportedCurrency,
+    getCurrencyDecimalPlaces,
+    getCurrencyValueByName
 };
