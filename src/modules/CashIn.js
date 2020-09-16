@@ -8,7 +8,7 @@ const cashIn = (amount, apiConfig) => {
         throw new Error('cachIn() Api Config is empty');
     }
     const { max: { amount: maxAmount }, percents } = apiConfig;
-    let commissionFee = amount / 100 * percents;
+    const commissionFee = amount / 100 * percents;
     return commissionFee <= maxAmount ? commissionFee : maxAmount;
 }
 

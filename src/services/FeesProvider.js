@@ -2,32 +2,29 @@ import { calculateFees, checkTransactionProps, getTransactionHistory } from '../
 import { isObjectEmpty, isSupportedCurrency, round, getCurrencyValueByName } from '../utils/Utils';
 import getApiConfig from '../services/ApiConfigProvider';
 
-const getFees = (currentTransaction, transactionHistory) => {
-    return new Promise((resolve, reject) => {
+const getFees = async(currentTransaction, transactionHistory) => {
         if (isObjectEmpty(currentTransaction)) {
-            reject(new Error('getFees() Transaction object is empty'));
+            throw new Error('getFees() Transaction object is empty');
         }
         const { type: transactionType, user_type: userType, operation: { currency } } = currentTransaction;
         if (!isSupportedCurrency(currency)) {
-            reject(new Error(`getFees() Operation currency is not supported. Currency ${currency}`));
+            new Error(`getFees() Operation currency is not supported. Currency ${currency}`);
         }
-        getApiConfig(transactionType, userType)
-            .then((apiConfig) => {
-                let decimalPoints = getCurrencyValueByName(currency);
-                let commisionFee = calculateFees(currentTransaction, transactionHistory, apiConfig);
-                resolve(round(commisionFee, decimalPoints).toFixed(decimalPoints));
-            })
-            .catch((error) => {
-                reject(new Error(`getFees() ${error}`));
-            });
-    });
+        try {
+            const apiConfig = await getApiConfig(transactionType, userType);
+            const decimalPoints = getCurrencyValueByName(currency);
+            const commisionFee = calculateFees(currentTransaction, transactionHistory, apiConfig);
+            return round(commisionFee, decimalPoints).toFixed(decimalPoints);
+        } catch(error){
+           throw new Error(`getFees() ${error.message}`);
+        }
 }
 
 const getPromises = (fileData) => {
     if (fileData.length === 0) {
         throw new Error(`getPromises() fileData is empty`);
     }
-    let promiseArray = [];
+    const promiseArray = [];
     fileData.map((currentTransaction) => {
         const { user_type: userType, user_id: userId, type, date } = currentTransaction;
         let transactionProps = {
@@ -46,20 +43,16 @@ const getPromises = (fileData) => {
     return promiseArray;
 }
 
-const getAllFees = (file) => {
-    return new Promise((resolve, reject) => {
-        if (file.length === 0) {
-            reject(new Error('getAllFees() Promise array is empty'));
-        }
+const getAllFees = async(file) => {
+    if (file.length === 0) {
+        throw new Error('getAllFees() Promise array is empty');
+    }
+    try {
         const arrayOfPromises = getPromises(file);
-        Promise.all(arrayOfPromises)
-            .then((result) => {
-                resolve(result);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    })
+        return await Promise.all(arrayOfPromises);
+    } catch(error){
+        throw new Error(`getAllFees() ${error.message}`);
+    }
 }
 
 export {
