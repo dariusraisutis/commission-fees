@@ -1,13 +1,13 @@
-const utils = require("../utils/Utils");
+import { isObjectEmpty } from '../utils/Utils';
 
-const cashOut = (userType, amount, currency, apiConfig, transactionHistory) => {
+const cashOut = (userType, amount, apiConfig, transactionHistory) => {
     if (!userType) {
         throw new Error(`cashOut() userType is invalid. ${userType}`);
     }
     if (!amount || isNaN(amount) || amount < 0) {
         throw new Error(`cashOut() Invalid operation amount. ${amount}`);
     }
-    if (utils.isObjectEmpty(apiConfig)) {
+    if (isObjectEmpty(apiConfig)) {
         throw new Error('cashOut() Api Config is empty.');
     }
     if (!Array.isArray(transactionHistory)) {
@@ -16,11 +16,11 @@ const cashOut = (userType, amount, currency, apiConfig, transactionHistory) => {
     let commissionFee = 0;
     switch (userType) {
         case 'natural': {
-            commissionFee = cashOutNatural(amount, currency, apiConfig, transactionHistory);
+            commissionFee = cashOutNatural(amount, apiConfig, transactionHistory);
             break;
         }
         case 'juridical': {
-            commissionFee = cashOutJuridical(amount, currency, apiConfig);
+            commissionFee = cashOutJuridical(amount, apiConfig);
             break;
         }
         default: {
@@ -30,28 +30,25 @@ const cashOut = (userType, amount, currency, apiConfig, transactionHistory) => {
     return commissionFee;
 }
 
-const cashOutNatural = (amount, currency, apiConfig, transactionHistory) => {
-    const { percents, week_limit: { amount: weekLimit } } = apiConfig;
-    let commisionFee = 0;
+const cashOutNatural = (amount, apiConfig, transactionHistory) => {
     let totalCashOut = 0;
     if (transactionHistory.length !== 0) {
         transactionHistory.map(({ operation: { amount } }) => {
             totalCashOut += amount;
         });
     }
-    let feesToChargeOn = getFeesToChargeOn(amount, totalCashOut, weekLimit);
-    let decimalPoints = utils.getCurrencyValueByName(currency);
+    const { percents, week_limit: { amount: weekLimit } } = apiConfig;
+    const feesToChargeOn = getFeesToChargeOn(amount, totalCashOut, weekLimit);
     if (feesToChargeOn === 0) {
-        return commisionFee.toFixed(decimalPoints);
+        return 0;
     }
-    return utils.round(feesToChargeOn / 100 * percents, decimalPoints).toFixed(decimalPoints);
+    return feesToChargeOn / 100 * percents;
 }
 
-const cashOutJuridical = (amount, currency, apiConfig) => {
+const cashOutJuridical = (amount, apiConfig) => {
     const { percents, min: { amount: minAmount } } = apiConfig;
-    let decimalPoints = utils.getCurrencyValueByName(currency);
-    let commissionFee = amount / 100 * percents;
-    return commissionFee < minAmount ? minAmount.toFixed(decimalPoints) : utils.round(commissionFee, decimalPoints).toFixed(decimalPoints);
+    const commissionFee = amount / 100 * percents;
+    return commissionFee < minAmount ? minAmount : commissionFee;
 }
 
 const getFeesToChargeOn = (amount, totalCashout, weekLimit) => {
@@ -64,9 +61,9 @@ const getFeesToChargeOn = (amount, totalCashout, weekLimit) => {
     }
 }
 
-module.exports = {
+export {
     cashOut,
     cashOutNatural,
     cashOutJuridical,
     getFeesToChargeOn
-}
+};

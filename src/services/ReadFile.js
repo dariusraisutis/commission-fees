@@ -1,5 +1,5 @@
-const fs = require('fs');
-const utils = require('../utils/Utils');
+import fs from 'fs';
+import { isObjectEmpty } from '../utils/Utils';
 
 const readFile = (filePath) => {
     return new Promise((resolve, reject) => {
@@ -12,10 +12,10 @@ const readFile = (filePath) => {
             }
             try {
                 let file = JSON.parse(data);
-                if (Array.isArray(file) && file.length === 0 || utils.isObjectEmpty(file)) {
+                if (Array.isArray(file) && file.length === 0 || isObjectEmpty(file)) {
                     reject(new Error('readFile() File contents are empty.'));
                 }
-                if (!Array.isArray(file) && !utils.isObjectEmpty(file)) {
+                if (!Array.isArray(file) && !isObjectEmpty(file)) {
                     let singleValueArray = [];
                     singleValueArray.push(file);
                     resolve(singleValueArray);
@@ -28,4 +28,4 @@ const readFile = (filePath) => {
     });
 }
 
-module.exports = { readFile };
+export default readFile;

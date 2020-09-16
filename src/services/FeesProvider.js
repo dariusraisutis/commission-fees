@@ -1,20 +1,21 @@
-const transaction = require('../modules/Transaction')
-const apiConfigProvider = require('./ApiConfigProvider');
-const utils = require('../utils/Utils');
+import { calculateFees, checkTransactionProps, getTransactionHistory } from '../modules/Transaction';
+import { isObjectEmpty, isSupportedCurrency, round, getCurrencyValueByName } from '../utils/Utils';
+import getApiConfig from '../services/ApiConfigProvider';
 
 const getFees = (currentTransaction, transactionHistory) => {
     return new Promise((resolve, reject) => {
-        if (utils.isObjectEmpty(currentTransaction)) {
+        if (isObjectEmpty(currentTransaction)) {
             reject(new Error('getFees() Transaction object is empty'));
         }
         const { type: transactionType, user_type: userType, operation: { currency } } = currentTransaction;
-        if (!utils.isSupportedCurrency(currency)) {
+        if (!isSupportedCurrency(currency)) {
             reject(new Error(`getFees() Operation currency is not supported. Currency ${currency}`));
         }
-        apiConfigProvider.getApiConfig(transactionType, userType)
+        getApiConfig(transactionType, userType)
             .then((apiConfig) => {
-                let commisionFee = transaction.calculateFees(currentTransaction, transactionHistory, apiConfig);
-                resolve(commisionFee);
+                let decimalPoints = getCurrencyValueByName(currency);
+                let commisionFee = calculateFees(currentTransaction, transactionHistory, apiConfig);
+                resolve(round(commisionFee, decimalPoints).toFixed(decimalPoints));
             })
             .catch((error) => {
                 reject(new Error(`getFees() ${error}`));
@@ -37,19 +38,20 @@ const getPromises = (fileData) => {
             type,
             index: fileData.indexOf(currentTransaction)
         };
-        transaction.checkTransactionProps(transactionProps);
-        let transactionHistory = transaction.getTransactionHistory(transactionProps);
+        checkTransactionProps(transactionProps);
+        let transactionHistory = getTransactionHistory(transactionProps);
         let promiseFunction = getFees(currentTransaction, transactionHistory);
         return promiseArray.push(promiseFunction);
     });
     return promiseArray;
 }
 
-const getAllFees = (arrayOfPromises) => {
+const getAllFees = (file) => {
     return new Promise((resolve, reject) => {
-        if (arrayOfPromises.length === 0) {
+        if (file.length === 0) {
             reject(new Error('getAllFees() Promise array is empty'));
         }
+        const arrayOfPromises = getPromises(file);
         Promise.all(arrayOfPromises)
             .then((result) => {
                 resolve(result);
@@ -60,7 +62,7 @@ const getAllFees = (arrayOfPromises) => {
     })
 }
 
-module.exports = {
+export {
     getFees,
     getPromises,
     getAllFees

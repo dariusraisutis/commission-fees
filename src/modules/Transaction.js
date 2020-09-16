@@ -1,23 +1,23 @@
-const utils = require('../utils/Utils');
-const cashIn = require('./CashIn');
-const cashout = require('./CashOut');
+import { isObjectEmpty } from '../utils/Utils';
+import { cashOut } from './CashOut';
+import cashIn from '../modules/CashIn';
 
 const calculateFees = (transactionObj, transactionHistory, apiConfig) => {
-    if (utils.isObjectEmpty(transactionObj)) {
+    if (isObjectEmpty(transactionObj)) {
         throw new Error('calculateFees() Transaction object is empty');
     }
-    if (utils.isObjectEmpty(apiConfig)) {
+    if (isObjectEmpty(apiConfig)) {
         throw new Error('calculateFees() ApiConfig object is empty');
     }
-    const { type: transactionType, user_type: userType, operation: { amount, currency } } = transactionObj;
+    const { type: transactionType, user_type: userType, operation: { amount } } = transactionObj;
     let commissionFee = 0;
     switch (transactionType) {
         case 'cash_in': {
-            commissionFee = cashIn.cashIn(amount, currency, apiConfig);
+            commissionFee = cashIn(amount, apiConfig);
             break;
         }
         case 'cash_out': {
-            commissionFee = cashout.cashOut(userType, amount, currency, apiConfig, transactionHistory);
+            commissionFee = cashOut(userType, amount, apiConfig, transactionHistory);
             break;
         }
         default: {
@@ -49,7 +49,7 @@ const getTransactionHistory = ({ array, date, userId, userType, type, index }) =
 }
 
 const checkTransactionProps = (transactionProps) => {
-    if (utils.isObjectEmpty(transactionProps)) {
+    if (isObjectEmpty(transactionProps)) {
         throw new Error('checkTransactionProps() Transactionprops are empty');
     }
     Object.keys(transactionProps).filter((prop) => {
@@ -65,7 +65,7 @@ const checkTransactionProps = (transactionProps) => {
 }
 
 
-module.exports = {
+export {
     calculateFees,
     getTransactionWeekRange,
     getTransactionHistory,

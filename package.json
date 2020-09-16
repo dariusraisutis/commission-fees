@@ -9,17 +9,22 @@
     },
     "jest": {
         "coverageReporters": [
-          "text",
-          "html"
+            "text",
+            "html"
         ],
         "roots": [
-          "tests"
+            "tests"
         ],
         "collectCoverage": true,
         "coverageDirectory": "<rootDir>/coverage/"
-      },
+    },
     "dependencies": {
         "axios": "^0.20.0",
+        "esm": "^3.2.25",
         "jest": "^26.4.2"
+    },
+    "devDependencies": {
+        "eslint": "^7.9.0",
+        "eslint-plugin-import": "^2.22.0"
     }
 }

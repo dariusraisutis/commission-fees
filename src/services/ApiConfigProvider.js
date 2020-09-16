@@ -1,5 +1,5 @@
-const axios = require('axios');
-const utils = require('../utils/Utils');
+import axios from 'axios';
+import { isObjectEmpty, buildApiConfigUrl } from '../utils/Utils';
 
 const getApiConfig = (transactionType, userType) => {
     return new Promise((resolve, reject) => {
@@ -9,10 +9,10 @@ const getApiConfig = (transactionType, userType) => {
         if (!userType) {
             reject(new Error(`getApiConfig() User type type was not provided. User type: ${userType}`));
         }
-        let requestUrl = utils.buildApiConfigUrl(transactionType, userType);
+        let requestUrl = buildApiConfigUrl(transactionType, userType);
         axios.get(requestUrl)
             .then(({ data }) => {
-                if (utils.isObjectEmpty(data)) {
+                if (isObjectEmpty(data)) {
                     reject(new Error('getApiConfig() Could not retrieve commission fees configuration'));
                 }
                 resolve(data);
@@ -23,4 +23,4 @@ const getApiConfig = (transactionType, userType) => {
     });
 }
 
-module.exports = { getApiConfig };
+export default getApiConfig;

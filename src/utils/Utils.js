@@ -1,4 +1,4 @@
-const config = require("../config/config.json");
+import config from '../config/config.json';
 
 const buildApiConfigUrl = (transactionType, userType) => {
     transactionType = transactionType.replace('_', '-');
@@ -19,7 +19,7 @@ const isSupportedCurrency = (currency) => {
     if(!currency) {
         throw new Error('isSupportedCurrency() currency is empty');
     }
-    let currencies = config.supportedCurrencies;
+    const currencies = config.supportedCurrencies;
     return currencies.some(element => element.name === currency);
 }
 
@@ -27,20 +27,20 @@ const getCurrencyValueByName = (currency) => {
     if(!isSupportedCurrency(currency)){
         throw new Error(`getCurrencyValueDecimalPlaces() currency is not supported. Currency ${currency}`);
     }
-    let supportedCurrencies = config.supportedCurrencies;
-    let keyValuePair = supportedCurrencies.find(element => element.name === currency);
-    return getCurrencyDecimalPlaces(keyValuePair.value);
+    const supportedCurrencies = config.supportedCurrencies;
+    const { value } = supportedCurrencies.find(element => element.name === currency);
+    return getCurrencyDecimalPlaces(value);
 }
 
 const isObjectEmpty = obj => Object.keys(obj).length === 0;
 
 const round = (value, decimalPlaces) => Math.ceil(value * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
 
-module.exports = {
+export {
     buildApiConfigUrl,
     isObjectEmpty,
     round,
     isSupportedCurrency,
     getCurrencyDecimalPlaces,
     getCurrencyValueByName
-};
+}
