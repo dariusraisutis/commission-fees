@@ -1,7 +1,7 @@
 import { getAllFees } from '../services/FeesProvider';
 import readFile from '../services/ReadFile';
 
-const run = async (filePath) => {
+const main = async (filePath) => {
   if (!filePath) {
     throw new Error('File path was not provided');
   }
@@ -13,4 +13,4 @@ const run = async (filePath) => {
   }
 }
 
-export default run;
+export default main;
